@@ -57,6 +57,28 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        // Construction app specific colors
+        success: {
+          DEFAULT: "hsl(var(--success))",
+          foreground: "hsl(var(--success-foreground))",
+        },
+        warning: {
+          DEFAULT: "hsl(var(--warning))",
+          foreground: "hsl(var(--warning-foreground))",
+        },
+        info: {
+          DEFAULT: "hsl(var(--info))",
+          foreground: "hsl(var(--info-foreground))",
+        },
+        scan: {
+          active: "hsl(var(--scan-active))",
+          processing: "hsl(var(--scan-processing))",
+          completed: "hsl(var(--scan-completed))",
+        },
+        path: {
+          primary: "hsl(var(--path-primary))",
+          secondary: "hsl(var(--path-secondary))",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
