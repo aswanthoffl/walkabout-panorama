@@ -34,17 +34,28 @@ export const LiveScanning = ({ onBack, onStopScan, scanConfig }: LiveScanningPro
   const [path, setPath] = useState<Array<{ x: number; y: number; timestamp: number }>>([]);
   const [isScanning, setIsScanning] = useState(true);
 
-  // Simulate movement and photo capture
+  // Real GPS and camera integration (requires Supabase)
   useEffect(() => {
     if (!isScanning) return;
 
+    // TODO: Replace with real Capacitor GPS tracking
+    // import { Geolocation } from '@capacitor/geolocation';
+    // const watchId = Geolocation.watchPosition({}, (position) => {
+    //   const { latitude, longitude } = position.coords;
+    //   // Convert GPS to floor plan coordinates
+    // });
+
     const interval = setInterval(() => {
-      // Simulate movement
+      // Simulate movement (replace with real GPS)
       const newX = Math.max(5, Math.min(95, currentPosition.x + (Math.random() - 0.5) * 4));
       const newY = Math.max(5, Math.min(95, currentPosition.y + (Math.random() - 0.5) * 4));
       
       setCurrentPosition({ x: newX, y: newY });
       setPath(prev => [...prev, { x: newX, y: newY, timestamp: Date.now() }]);
+      
+      // TODO: Replace with real Capacitor Camera
+      // import { Camera } from '@capacitor/camera';
+      // Camera.getPhoto({ quality: 90, source: CameraSource.Camera });
       
       // Simulate photo capture and distance tracking
       setScanStats(prev => ({

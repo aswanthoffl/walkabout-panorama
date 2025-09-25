@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, ChevronLeft, ChevronRight, Share, MessageCircle, RotateCw, ZoomIn, ZoomOut, Map } from "lucide-react";
+import { ArrowLeft, ChevronLeft, ChevronRight, ChevronUp, ChevronDown, Share, MessageCircle, RotateCw, ZoomIn, ZoomOut, Map, MapPin, Compass, Navigation } from "lucide-react";
 import panoramaImage from "@/assets/panorama-demo.jpg";
 
 interface PanoramaViewerProps {
@@ -14,6 +14,8 @@ interface PanoramaViewerProps {
 export const PanoramaViewer = ({ onBack, tourDate, tourName }: PanoramaViewerProps) => {
   const [showMiniMap, setShowMiniMap] = useState(true);
   const [currentView, setCurrentView] = useState(0);
+  const [currentPosition, setCurrentPosition] = useState({ x: 70, y: 35 });
+  const [currentDirection, setCurrentDirection] = useState(0); // 0=North, 90=East, 180=South, 270=West
   const totalViews = 78;
 
   return (
@@ -74,7 +76,23 @@ export const PanoramaViewer = ({ onBack, tourDate, tourName }: PanoramaViewerPro
                       strokeWidth="1.5"
                       fill="none"
                     />
-                    <circle cx="70" cy="35" r="2" fill="hsl(var(--primary))" />
+                    
+                    {/* Available viewpoints */}
+                    <circle cx="20" cy="70" r="1.5" fill="hsl(var(--primary))" opacity="0.6" className="cursor-pointer" />
+                    <circle cx="30" cy="60" r="1.5" fill="hsl(var(--primary))" opacity="0.6" className="cursor-pointer" />
+                    <circle cx="40" cy="50" r="1.5" fill="hsl(var(--primary))" opacity="0.6" className="cursor-pointer" />
+                    <circle cx="50" cy="45" r="1.5" fill="hsl(var(--primary))" opacity="0.6" className="cursor-pointer" />
+                    <circle cx="60" cy="40" r="1.5" fill="hsl(var(--primary))" opacity="0.6" className="cursor-pointer" />
+                    
+                    {/* Current position with pulse */}
+                    <circle cx={currentPosition.x} cy={currentPosition.y} r="2.5" fill="hsl(var(--accent))" stroke="white" strokeWidth="0.5">
+                      <animate attributeName="r" values="2.5;4;2.5" dur="2s" repeatCount="indefinite" />
+                    </circle>
+                    
+                    {/* Direction indicator */}
+                    <g transform={`translate(${currentPosition.x}, ${currentPosition.y}) rotate(${currentDirection})`}>
+                      <polygon points="0,-2 1,1 0,0.5 -1,1" fill="white" />
+                    </g>
                   </g>
                 </svg>
                 
@@ -174,11 +192,78 @@ export const PanoramaViewer = ({ onBack, tourDate, tourName }: PanoramaViewerPro
         </div>
       </div>
 
-      {/* Touch/Drag Hint */}
-      <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-5">
-        <div className="text-center text-foreground/60">
-          <div className="mb-2 text-4xl">🔄</div>
-          <p className="text-sm">Drag to look around</p>
+      {/* Street View Navigation Arrows */}
+      <div className="absolute inset-0 pointer-events-none z-5">
+        {/* Forward Arrow */}
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-auto">
+          <Button 
+            size="lg" 
+            className="bg-white/10 hover:bg-white/20 backdrop-blur-sm border-white/20 rounded-full h-16 w-16 text-white"
+            onClick={() => {
+              const newY = Math.max(10, currentPosition.y - 10);
+              setCurrentPosition(prev => ({ ...prev, y: newY }));
+            }}
+          >
+            <ChevronUp className="h-8 w-8" />
+          </Button>
+        </div>
+        
+        {/* Left Arrow */}
+        <div className="absolute top-1/2 left-8 transform -translate-y-1/2 pointer-events-auto">
+          <Button 
+            size="lg" 
+            className="bg-white/10 hover:bg-white/20 backdrop-blur-sm border-white/20 rounded-full h-14 w-14 text-white"
+            onClick={() => {
+              const newX = Math.max(10, currentPosition.x - 10);
+              setCurrentPosition(prev => ({ ...prev, x: newX }));
+              setCurrentDirection((prev) => (prev - 90 + 360) % 360);
+            }}
+          >
+            <ChevronLeft className="h-6 w-6" />
+          </Button>
+        </div>
+        
+        {/* Right Arrow */}
+        <div className="absolute top-1/2 right-8 transform -translate-y-1/2 pointer-events-auto">
+          <Button 
+            size="lg" 
+            className="bg-white/10 hover:bg-white/20 backdrop-blur-sm border-white/20 rounded-full h-14 w-14 text-white"
+            onClick={() => {
+              const newX = Math.min(90, currentPosition.x + 10);
+              setCurrentPosition(prev => ({ ...prev, x: newX }));
+              setCurrentDirection((prev) => (prev + 90) % 360);
+            }}
+          >
+            <ChevronRight className="h-6 w-6" />
+          </Button>
+        </div>
+        
+        {/* Back Arrow */}
+        <div className="absolute bottom-32 left-1/2 transform -translate-x-1/2 pointer-events-auto">
+          <Button 
+            size="lg" 
+            className="bg-white/10 hover:bg-white/20 backdrop-blur-sm border-white/20 rounded-full h-14 w-14 text-white"
+            onClick={() => {
+              const newY = Math.min(80, currentPosition.y + 10);
+              setCurrentPosition(prev => ({ ...prev, y: newY }));
+            }}
+          >
+            <ChevronDown className="h-6 w-6" />
+          </Button>
+        </div>
+        
+        {/* Location Info */}
+        <div className="absolute bottom-40 left-4 pointer-events-auto">
+          <Card className="bg-black/50 backdrop-blur-sm border-white/20 text-white p-3">
+            <div className="flex items-center gap-2 text-sm">
+              <MapPin className="h-4 w-4" />
+              <span>Building A - Floor 2</span>
+            </div>
+            <div className="flex items-center gap-2 text-xs opacity-75 mt-1">
+              <Compass className="h-3 w-3" />
+              <span>Facing {['North', 'East', 'South', 'West'][currentDirection / 90]}</span>
+            </div>
+          </Card>
         </div>
       </div>
     </div>

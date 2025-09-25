@@ -4,8 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeft, Upload, CheckCircle, FileImage } from "lucide-react";
+import { ArrowLeft, Upload, CheckCircle, FileImage, MapPin } from "lucide-react";
 import { toast } from "sonner";
+import { GPSLocationPicker } from "./GPSLocationPicker";
 
 interface NewScanSetupProps {
   onBack: () => void;
@@ -16,12 +17,14 @@ interface ScanConfig {
   tourName: string;
   captureInterval: string;
   floorPlan?: File;
+  siteLocation?: { lat: number; lng: number; address: string };
 }
 
 export const NewScanSetup = ({ onBack, onStartScan }: NewScanSetupProps) => {
   const [tourName, setTourName] = useState('');
   const [captureInterval, setCaptureInterval] = useState('2m');
   const [floorPlan, setFloorPlan] = useState<File | null>(null);
+  const [siteLocation, setSiteLocation] = useState<{ lat: number; lng: number; address: string } | null>(null);
   const [cameraConnected] = useState(true); // Simulated connection status
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -41,7 +44,8 @@ export const NewScanSetup = ({ onBack, onStartScan }: NewScanSetupProps) => {
     const config: ScanConfig = {
       tourName,
       captureInterval,
-      floorPlan: floorPlan || undefined
+      floorPlan: floorPlan || undefined,
+      siteLocation: siteLocation || undefined
     };
     
     onStartScan(config);
@@ -58,6 +62,11 @@ export const NewScanSetup = ({ onBack, onStartScan }: NewScanSetupProps) => {
       </div>
 
       <div className="space-y-6">
+        {/* GPS Location Setup */}
+        <GPSLocationPicker
+          onLocationSelect={setSiteLocation}
+        />
+
         {/* Tour Name */}
         <div className="space-y-2">
           <Label htmlFor="tourName" className="text-foreground font-medium">
